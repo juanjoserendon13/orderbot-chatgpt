@@ -6,11 +6,12 @@ name = "pypi"
 [packages]
 python-dotenv = "~=1.0"
 openai = "~=0.27"
+panel = "~=1.1.0"
 
 [dev-packages]
 
 [scripts]
-start = "python -m src.app"
+start = "panel serve src/app.py --show --autoreload"
 
 [requires]
 python_version = "3.10"
