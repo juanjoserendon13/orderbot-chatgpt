@@ -5,10 +5,10 @@ sys.path.append(str(path_root))
 # print(sys.path)
 
 from helpers.setup_openai import OPENAI_MODULE as openai
+from helpers.utils import transform_to_json
 from helpers.get_completion_llm import (
     get_completion_from_messages
 )
-import json
 
 import panel as pn  # GUI
 pn.extension()
@@ -42,7 +42,6 @@ Drinks: \
 coke 3.00, 2.00, 1.00 \
 sprite 3.00, 2.00, 1.00 \
 bottled water 5.00 \
-Make sure to add 'Thank you for using OrderBot' at the end when the customer completed their order.
 """} ]  # accumulate messages
 
 # Finally format your response for the customer as a JSON object with 'orderbot_response' and 'order_is_completed' as keys. \
@@ -55,13 +54,14 @@ def collect_messages(_):
     input.value = ''
     bot_context.append({'role':'user', 'content':f"{prompt}"})
     response = get_completion_from_messages(openai, bot_context)
-    # print(response)
-    # response_dict = json.loads(response)
-    bot_context.append({'role':'assistant', 'content':f"{response}"})
+    response_dict = transform_to_json(response)
+    response_content =  response_dict.get('orderbot_response') if response_dict else response
+    # print(response, response_dict)
+    bot_context.append({'role':'assistant', 'content':f"{response_content}"})
     panels.append(
         pn.Row('User:', pn.pane.Markdown(prompt, width=600)))
     panels.append(
-        pn.Row('Assistant:', pn.pane.Markdown(response, width=600, style={'background-color': '#F6F6F6'})))
+        pn.Row('Assistant:', pn.pane.Markdown(response_content, width=600, style={'background-color': '#F6F6F6'})))
 
     return pn.Column(*panels)
 
